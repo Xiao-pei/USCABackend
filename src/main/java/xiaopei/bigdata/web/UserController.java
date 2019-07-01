@@ -1,0 +1,84 @@
+package xiaopei.bigdata.web;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import xiaopei.bigdata.Service.UserDTORegisterServiceInterface;
+import xiaopei.bigdata.User.User;
+import xiaopei.bigdata.User.UserDTO;
+import xiaopei.bigdata.User.UserRepository;
+import xiaopei.bigdata.validator.UserValidator;
+
+@Controller
+public class UserController {
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private UserValidator userValidator;
+    @Autowired
+    private UserDTORegisterServiceInterface userDTORegisterService;
+
+    @GetMapping(path = "/register")
+    public String getRegisterForm(Model model) {
+        model.addAttribute("user", new UserDTO());
+        return "register";
+    }
+
+    @PostMapping(path = "/register")
+    public @ResponseBody
+    String Register(@ModelAttribute("user") UserDTO user, BindingResult bindingResult) {
+        userValidator.validate(user, bindingResult);
+        User registered;
+        if (bindingResult.hasErrors()) {
+            return "error";
+        } else {
+            registered = saveRegisterUser(user);
+            return registered.toString();
+        }
+    }
+
+    @GetMapping(path = "/profile/{username}")
+    public @ResponseBody
+    String getProfile(@PathVariable("username") String username, Model model) {
+        User user = userRepository.findUserByUsername(username);
+        return user.toString();
+    }
+
+    @PostMapping(path = "/add")
+    public @ResponseBody
+    String addUser(@RequestParam String username,
+                   @RequestParam String password) {
+        User user = new User(username, password);
+        userRepository.save(user);
+        return user.toString();
+    }
+
+    @GetMapping(path = "/all")
+    public @ResponseBody
+    Iterable<User> getAllUsers() {
+        // This returns a JSON or XML with the users
+        return userRepository.findAll();
+    }
+
+    @GetMapping(path = "/login")
+    public String getLoginForm() {
+        return "login";
+    }
+
+
+    @GetMapping({"/welcome"})
+    public @ResponseBody
+    String welcome(Model model) {
+        return "welcome";
+    }
+
+    private User saveRegisterUser(UserDTO u) {
+        try {
+            return userDTORegisterService.registerNewUserAccount(u);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+}
