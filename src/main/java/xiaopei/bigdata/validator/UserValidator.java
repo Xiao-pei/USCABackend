@@ -1,13 +1,15 @@
 package xiaopei.bigdata.validator;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
-import xiaopei.bigdata.User.UserDTO;
+import xiaopei.bigdata.model.UserDTO;
 
 import java.util.regex.Pattern;
 
+@Slf4j
 @Component
 public class UserValidator implements Validator {
 
@@ -21,19 +23,20 @@ public class UserValidator implements Validator {
         UserDTO user = (UserDTO) o;
 
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "NotEmpty");
-        if (user.getUsername().length() < 6 || user.getUsername().length() > 32) {
-            errors.rejectValue("username", "Size.user.username");
+        if (user.getUsername().length() > 32) {
+            errors.rejectValue("username", "密码长度必须在32个字符内");
         }
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "NotEmpty");
-        if (user.getPassword().length() < 6 || user.getPassword().length() > 32) {
-            errors.rejectValue("password", "Size.user.password");
+        if (user.getPassword().length() < 6 || user.getPassword().length() > 20) {
+            errors.rejectValue("password", "密码长度必须在6-20个字符内");
         }
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "telephone", "NotEmpty");
-        if (!Pattern.matches("^1(3|4|5|7|8)\\d{9}$", user.getTelephone()))
-            errors.rejectValue("telephone", "Illegal.user.telephone");
-
-        if (!user.getConfirmPassword().equals(user.getPassword())) {
-            errors.rejectValue("passwordConfirm", "Diff.user.passwordConfirm");
+        if (!Pattern.matches("^1(3|4|5|7|8)\\d{9}$", user.getTelephone())) {
+            errors.rejectValue("telephone", "电话格式错误");
         }
+        if (!user.getConfirmPassword().equals(user.getPassword())) {
+            errors.rejectValue("passwordConfirm", "两次密码不一致");
+        }
+        log.debug("UserForm form OK");
     }
 }

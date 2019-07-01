@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import xiaopei.bigdata.User.User;
-import xiaopei.bigdata.User.UserDTO;
-import xiaopei.bigdata.User.UserRepository;
+import xiaopei.bigdata.model.User;
+import xiaopei.bigdata.model.UserDTO;
+import xiaopei.bigdata.model.UserRepository;
 
 @Service
 public class UserDTORegisterService implements UserDTORegisterServiceInterface {

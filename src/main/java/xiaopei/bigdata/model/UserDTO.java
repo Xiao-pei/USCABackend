@@ -1,4 +1,4 @@
-package xiaopei.bigdata.User;
+package xiaopei.bigdata.model;
 
 import lombok.Data;
 
