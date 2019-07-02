@@ -1,13 +1,12 @@
 package xiaopei.bigdata.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 @Entity
@@ -17,13 +16,16 @@ public class User {
     private Long id;
     @NotNull
     private Integer userType; //0 for ordinary user
+    @NotNull
     private String name;
     @NotNull
     private String username;
     @NotNull
+    @JsonIgnore
     private String securedPassword;
     private String telephone;
-    private String skill;
+    @ManyToMany
+    private List<Skill> skills;
 
     protected User() {
         userType = 0;

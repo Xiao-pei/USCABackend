@@ -24,7 +24,7 @@ public class DetailService implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         User user = userRepository.findUserByUsername(s);
-        if (user == null) throw new UsernameNotFoundException(s);
+        if (user == null) throw new UsernameNotFoundException("user not found: " + s);
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
         if (user.getUserType() == 0)
             grantedAuthorities.add(new SimpleGrantedAuthority("User"));

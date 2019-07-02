@@ -8,12 +8,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import xiaopei.bigdata.MyException;
 import xiaopei.bigdata.Service.UserDTORegisterServiceInterface;
 import xiaopei.bigdata.model.User;
 import xiaopei.bigdata.model.UserDTO;
 import xiaopei.bigdata.model.UserRepository;
 import xiaopei.bigdata.validator.UserValidator;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,18 +58,10 @@ public class UserController {
     public ResponseEntity<User> getProfile(@PathVariable("username") String username, Model model) {
         User user = userRepository.findUserByUsername(username);
         if (user == null)
-            return ResponseEntity.notFound().build();
+            throw new MyException(HttpServletResponse.SC_NOT_FOUND, "No such user " + username);
         return ResponseEntity.ok(user);
     }
 
-    @PostMapping(path = "/add")
-    public @ResponseBody
-    String addUser(@RequestParam String username,
-                   @RequestParam String password) {
-        User user = new User(username, password);
-        userRepository.save(user);
-        return user.toString();
-    }
 
     @GetMapping(path = "/all")
     public @ResponseBody
