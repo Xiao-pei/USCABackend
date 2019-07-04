@@ -8,4 +8,6 @@ import java.util.List;
 public interface SkillRepository extends JpaRepository<Skill, Long> {
     List<Skill> findSkillByNameLike(String name);
 
+    Skill findSkillById(Long id);
+
 }

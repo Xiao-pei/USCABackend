@@ -2,7 +2,6 @@ package xiaopei.bigdata.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -10,29 +9,27 @@ import org.springframework.web.bind.annotation.*;
 import xiaopei.bigdata.MyException;
 import xiaopei.bigdata.Service.SecurityServiceInterface;
 import xiaopei.bigdata.Service.UserDTORegisterServiceInterface;
-import xiaopei.bigdata.Service.WordCountTestService;
 import xiaopei.bigdata.model.*;
 import xiaopei.bigdata.validator.UserValidator;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class UserController {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private SkillRepository skillRepository;
-    @Autowired
-    private UserValidator userValidator;
-    @Autowired
-    private UserDTORegisterServiceInterface userDTORegisterService;
-    @Autowired
-    private SecurityServiceInterface securityService;
-    @Autowired
-    private WordCountTestService service;
+    private final UserRepository userRepository;
+    private final SkillRepository skillRepository;
+    private final UserValidator userValidator;
+    private final UserDTORegisterServiceInterface userDTORegisterService;
+    private final SecurityServiceInterface securityService;
+
+    public UserController(SecurityServiceInterface securityService, UserRepository userRepository, SkillRepository skillRepository, UserValidator userValidator, UserDTORegisterServiceInterface userDTORegisterService) {
+        this.securityService = securityService;
+        this.userRepository = userRepository;
+        this.skillRepository = skillRepository;
+        this.userValidator = userValidator;
+        this.userDTORegisterService = userDTORegisterService;
+    }
 
     @GetMapping(path = "/register")
     public String getRegisterForm(Model model) {
@@ -63,7 +60,7 @@ public class UserController {
         User user = userRepository.findUserByUsername(username);
         if (user == null)
             throw new MyException(HttpServletResponse.SC_NOT_FOUND, "No such user " + username);
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("error", 0);
         map.put("data", user);
         return ResponseEntity.ok(map);
@@ -77,9 +74,9 @@ public class UserController {
         return words;
     }
 
-    @GetMapping(path = "/api/user")
+    @GetMapping(path = "/user/info")
     public Map<String, Object> getCurrentUser() {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("error", 0);
         String username = securityService.findLoggedInUsername();
         User currentUser = userRepository.findUserByUsername(username);
@@ -104,11 +101,66 @@ public class UserController {
 
     @PostMapping(path = "/profile/update")
     public ResponseEntity<Map<String, Object>> updateUserInfo(@ModelAttribute UserUpdateForm updateForm) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         //Todo
         return ResponseEntity.ok(map);
     }
 
+    @PostMapping(path = "/user/job")
+    public ObjectNode UserQingDingJob(@RequestParam Job job) {
+        ObjectNode node = new ObjectMapper().createObjectNode();
+        node.put("errmsg", "nothing");
+        //Todo
+        return node;
+    }
+
+    @GetMapping(path = "/user/job")
+    public Map<String, Object> GetUserJobResult() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        //Todo
+        return null;
+    }
+
+    @GetMapping(path = "/user/tags")
+    public Map<String, Object> GetUserSkills() {
+        String username = securityService.findLoggedInUsername();
+        User user = userRepository.findUserByUsername(username);
+        Set<UserSkill> userSkillList = user.getUserSkills();
+        List<SkillNameLevel> skills = new ArrayList<SkillNameLevel>();
+        for (UserSkill userSkill : userSkillList) {
+            skills.add(new SkillNameLevel(userSkill.getSkill(), userSkill.getLevel()));
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("error", 0);
+        map.put("errmsg", "nothing");
+        map.put("data", skills);
+        return map;
+    }
+
+    @PostMapping(path = "/user/tags")
+    public ObjectNode SaveUserSkills(@RequestBody SkillLevelList data) {
+        ObjectNode node = new ObjectMapper().createObjectNode();
+        String username = securityService.findLoggedInUsername();
+        User currentUser = userRepository.findUserByUsername(username);
+        for (SkillLevel skillLevel : data.getData()) {
+            Skill skill = skillRepository.findSkillById(skillLevel.getId());
+            if (skill == null) {
+                continue;
+            }
+            SaveUserSkill(currentUser, skill, skillLevel.getLevel());
+        }
+        node.put("errmsg", 0);
+        return node;
+    }
+
+    @GetMapping(path = "/analysis/jobs")
+    public Map<String, Object> getJobAnalysis() {
+        //Todo
+        Map<String, Object> map = new HashMap<>();
+        map.put("error", 0);
+        map.put("errmsg", "nothing");
+        return map;
+    }
     @GetMapping(path = "/login")
     public String getLoginForm() {
         return "login";
@@ -122,8 +174,8 @@ public class UserController {
         }
     }
 
-    protected void SaveUserSkill(User user, Skill skill) {
-        UserSkill userSkill = new UserSkill(user, skill);
+    private void SaveUserSkill(User user, Skill skill, int level) {
+        UserSkill userSkill = new UserSkill(user, skill, level);
         if (user.getUserSkills().contains(userSkill))
             return;
         user.getUserSkills().add(userSkill);
@@ -131,8 +183,8 @@ public class UserController {
         userRepository.save(user);
     }
 
-    protected boolean DeleteUserSkill(User user, Skill skill) {
-        List<UserSkill> userskills = user.getUserSkills();
+    private boolean DeleteUserSkill(User user, Skill skill) {
+        Set<UserSkill> userskills = user.getUserSkills();
         for (UserSkill userSkill : userskills) {
             if (userSkill.getSkill().equals(skill)) {
                 userskills.remove(userSkill);

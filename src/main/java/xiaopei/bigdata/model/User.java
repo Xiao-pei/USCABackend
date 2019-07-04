@@ -6,8 +6,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -25,9 +24,10 @@ public class User {
     @NotNull
     @JsonIgnore
     private String securedPassword;
-    private String phone;
+    private String telephone;
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserSkill> userSkills = new ArrayList<>();
+    private Set<UserSkill> userSkills;
 
     protected User() {
         userType = 0;

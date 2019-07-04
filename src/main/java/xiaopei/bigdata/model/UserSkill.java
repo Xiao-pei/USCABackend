@@ -33,10 +33,16 @@ public class UserSkill implements Serializable {
         this.skill = skill;
     }
 
-    @Override
+    public UserSkill(User user, Skill skill, int level) {
+        this.user = user;
+        this.skill = skill;
+        this.level = level;
+    }
+
+/*    @Override
     public int hashCode() {
         return Objects.hash(user, skill);
-    }
+    }*/
 
     @Override
     public boolean equals(Object obj) {
