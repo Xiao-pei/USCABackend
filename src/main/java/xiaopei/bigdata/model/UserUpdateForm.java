@@ -6,23 +6,15 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Data
-public class UserDTO {
+public class UserUpdateForm {
     @NotNull
     private String name;
     @NotNull
-    private String username;
+    private String telephone;
     @NotNull
     @Size(min = 6, max = 20)
     private String password;
     @NotNull
     @Size(min = 6, max = 20)
-    private String confirm;
-    @NotNull
-    private String phone;
-    @NotNull
-    private Long captcha;
-
-    public UserDTO() {
-    }
-
+    private String confirmPassword;
 }

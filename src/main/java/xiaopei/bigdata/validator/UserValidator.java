@@ -30,12 +30,16 @@ public class UserValidator implements Validator {
         if (user.getPassword().length() < 6 || user.getPassword().length() > 20) {
             errors.rejectValue("password", "密码长度必须在6-20个字符内");
         }
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "telephone", "NotEmpty");
-        if (!Pattern.matches("^1(3|4|5|7|8)\\d{9}$", user.getTelephone())) {
-            errors.rejectValue("telephone", "电话格式错误");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "phone", "NotEmpty");
+        if (!Pattern.matches("^1(3|4|5|7|8)\\d{9}$", user.getPhone())) {
+            errors.rejectValue("phone", "电话格式错误");
         }
-        if (!user.getConfirmPassword().equals(user.getPassword())) {
-            errors.rejectValue("passwordConfirm", "两次密码不一致");
+        if (!user.getConfirm().equals(user.getPassword())) {
+            errors.rejectValue("confirm", "两次密码不一致");
+        }
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "captcha", "NotEmpty");
+        if (user.getCaptcha() != 114514) {
+            errors.rejectValue("captcha", "验证码错误");
         }
         log.debug("UserForm form OK");
     }

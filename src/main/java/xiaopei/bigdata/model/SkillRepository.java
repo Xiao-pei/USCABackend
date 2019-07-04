@@ -1,7 +1,11 @@
 package xiaopei.bigdata.model;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 
 
-public interface SkillRepository extends CrudRepository<Skill, Long> {
+public interface SkillRepository extends JpaRepository<Skill, Long> {
+    List<Skill> findSkillByNameLike(String name);
+
 }

@@ -6,10 +6,12 @@ import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @Entity
+@Table(name = "user")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,9 +25,9 @@ public class User {
     @NotNull
     @JsonIgnore
     private String securedPassword;
-    private String telephone;
-    @ManyToMany
-    private List<Skill> skills;
+    private String phone;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserSkill> userSkills = new ArrayList<>();
 
     protected User() {
         userType = 0;
@@ -44,4 +46,21 @@ public class User {
         this.securedPassword = securedPassword;
     }
 
+/*    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equal(id, user.id) &&
+                Objects.equal(userType, user.userType) &&
+                Objects.equal(name, user.name) &&
+                Objects.equal(username, user.username) &&
+                Objects.equal(securedPassword, user.securedPassword) &&
+                Objects.equal(telephone, user.telephone);
+    }*/
+
+/*    @Override
+    public int hashCode() {
+        return Objects.hashCode(username, securedPassword);
+    }*/
 }

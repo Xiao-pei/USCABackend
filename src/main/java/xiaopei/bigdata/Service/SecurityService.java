@@ -1,7 +1,6 @@
 package xiaopei.bigdata.Service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class SecurityService implements SecurityServiceInterface {
     @Autowired
@@ -19,11 +19,11 @@ public class SecurityService implements SecurityServiceInterface {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    private static final Logger logger = LoggerFactory.getLogger(SecurityService.class);
-
     @Override
     public String findLoggedInUsername() {
-        Object userDetails = SecurityContextHolder.getContext().getAuthentication().getDetails();
+
+        Object userDetails = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        log.debug(userDetails.toString());
         if (userDetails instanceof UserDetails) {
             return ((UserDetails) userDetails).getUsername();
         }
@@ -39,7 +39,7 @@ public class SecurityService implements SecurityServiceInterface {
 
         if (usernamePasswordAuthenticationToken.isAuthenticated()) {
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            logger.debug(String.format("Auto login %s successfully!", username));
+            log.debug(String.format("Auto login %s successfully!", username));
         }
     }
 }

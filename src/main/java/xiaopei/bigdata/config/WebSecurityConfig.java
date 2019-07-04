@@ -1,4 +1,4 @@
-package xiaopei.bigdata;
+package xiaopei.bigdata.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -33,12 +33,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/", "/register").permitAll()
-                .anyRequest().authenticated()
+                .antMatchers("/", "/register", "/search", "api/check").permitAll()
+                .anyRequest().permitAll()
                 .and()
                 .formLogin()
                 .loginPage("/login")
-                /**Login success**/
+                /**Login success*/
                 .successHandler((httpServletRequest, httpServletResponse, authentication) -> {
                     httpServletResponse.setContentType("application/json;charset=utf-8");
                     PrintWriter out = httpServletResponse.getWriter();
@@ -52,7 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     out.flush();
                     out.close();
                 })
-                /**Login failed**/
+                /**Login failed*/
                 .failureHandler((httpServletRequest, resp, authentication) -> {
                     resp.setContentType("application/json;charset=utf-8");
                     ObjectMapper objectMapper = new ObjectMapper();
@@ -72,7 +72,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     node.put("message", e.getMessage());
                     WriteString(resp.getWriter(), objectMapper.writeValueAsString(node));
                 })
-                /**Login required**/
+                /**Login required*/
                 .authenticationEntryPoint((HttpServletRequest httpServletRequest,
                                            HttpServletResponse resp,
                                            AuthenticationException e) -> {

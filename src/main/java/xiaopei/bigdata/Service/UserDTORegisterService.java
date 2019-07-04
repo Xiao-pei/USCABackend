@@ -24,7 +24,7 @@ public class UserDTORegisterService implements UserDTORegisterServiceInterface {
         User user = new User(accountDto.getUsername(), bCryptPasswordEncoder.encode(accountDto.getPassword()));
         user.setName(accountDto.getName());
         user.setUserType(0);
-        user.setTelephone(accountDto.getTelephone());
+        user.setPhone(accountDto.getPhone());
         return repository.save(user);
     }
 }
