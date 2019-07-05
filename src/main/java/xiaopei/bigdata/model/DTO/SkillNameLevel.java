@@ -1,7 +1,11 @@
-package xiaopei.bigdata.model;
+package xiaopei.bigdata.model.DTO;
 
 import lombok.Data;
+import xiaopei.bigdata.model.Skill;
 
+/**
+ * Data transfer object
+ */
 @Data
 public class SkillNameLevel {
     private String name;

@@ -5,6 +5,7 @@ import lombok.Data;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
@@ -20,8 +21,11 @@ public class Skill {
     @NaturalId
     private String name;
     @JsonIgnore
-    @OneToMany(mappedBy = "skill")
+    @OneToMany(mappedBy = "skill", fetch = FetchType.LAZY)
     private Set<UserSkill> userSkills;
+    @JsonIgnore
+    @OneToMany(mappedBy = "skill", fetch = FetchType.LAZY)
+    private Set<AnalysisResult> analysisResults;
 
     Skill() {
     }

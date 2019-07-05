@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2019 Xiaopei https://github.com/Xiao-pei
+ */
+
 package xiaopei.bigdata;
 
 import org.springframework.boot.SpringApplication;

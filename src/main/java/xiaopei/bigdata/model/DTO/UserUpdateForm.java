@@ -1,4 +1,4 @@
-package xiaopei.bigdata.model;
+package xiaopei.bigdata.model.DTO;
 
 import lombok.Data;
 
