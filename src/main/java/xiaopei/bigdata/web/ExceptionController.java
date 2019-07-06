@@ -17,7 +17,7 @@ public class ExceptionController {
         ObjectNode node = new ObjectMapper().createObjectNode();
         node.put("error", 1);
         node.put("code", ex.getErrCode());
-        node.put("message", ex.getMessage());
+        node.put("errmsg", ex.getMessage());
         return new ResponseEntity<>(node, HttpStatus.NOT_FOUND);
     }
 
@@ -25,7 +25,7 @@ public class ExceptionController {
     public ResponseEntity<ObjectNode> handleUsernameNotFoundException(UsernameNotFoundException ex) {
         ObjectNode node = new ObjectMapper().createObjectNode();
         node.put("error", 1);
-        node.put("message", ex.getMessage());
+        node.put("errmsg", ex.getMessage());
         return new ResponseEntity<>(node, HttpStatus.NOT_FOUND);
     }
 

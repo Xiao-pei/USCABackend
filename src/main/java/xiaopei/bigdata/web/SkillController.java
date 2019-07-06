@@ -19,13 +19,13 @@ public class SkillController {
     @Autowired
     private SkillRepository repository;
 
-    @GetMapping(path = "/tags/search")
+    @GetMapping(path = "/api/taglist")
     public Map<String, Object> SearchSkill(@RequestParam("text") String text) {
         logger.info("request" + text);
         Map<String, Object> objectMap = new HashMap<>();
-        if (text == "%") {
+        if (text.equals("%")) {
             objectMap.put("error", 1);
-            objectMap.put("message", "Illegal input.");
+            objectMap.put("errmsg", "Illegal input.");
             return objectMap;
         }
         StringBuffer stringBuffer = new StringBuffer();

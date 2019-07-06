@@ -1,6 +1,7 @@
 package xiaopei.bigdata.model.DTO;
 
 import lombok.Data;
+import xiaopei.bigdata.model.UserJob;
 
 /**
  * Data transfer object
@@ -15,5 +16,11 @@ public class JobWithScore {
         this.id = id;
         this.name = name;
         this.score = score;
+    }
+
+    public JobWithScore(UserJob userJob) {
+        this.id = userJob.getJob().getId();
+        this.name = userJob.getJob().getName();
+        this.score = userJob.getScore();
     }
 }

@@ -12,10 +12,7 @@ import xiaopei.bigdata.Service.UserDTORegisterServiceInterface;
 import xiaopei.bigdata.Service.UserSkillAnalysisServiceInterface;
 import xiaopei.bigdata.Service.UserSkillServiceInterface;
 import xiaopei.bigdata.model.DTO.*;
-import xiaopei.bigdata.model.Skill;
-import xiaopei.bigdata.model.SkillRepository;
-import xiaopei.bigdata.model.User;
-import xiaopei.bigdata.model.UserRepository;
+import xiaopei.bigdata.model.*;
 import xiaopei.bigdata.validator.UserValidator;
 
 import javax.servlet.http.HttpServletResponse;
@@ -98,10 +95,10 @@ public class UserController {
         ObjectNode node = new ObjectMapper().createObjectNode();
         if (userRepository.findUserByUsername(username) == null) {
             node.put("error", 0);
-            node.put("message", "Congratulation! username is Ok to use.");
+            node.put("errmsg", "Congratulation! username is Ok to use.");
         } else {
             node.put("error", 1);
-            node.put("message", "不！用户名已被占用 !");
+            node.put("errmsg", "不！用户名已被占用 !");
         }
         return node;
     }
@@ -116,15 +113,28 @@ public class UserController {
     @PostMapping(path = "/user/job")
     public ObjectNode UserQingDingJob(@RequestParam JobWithScore jobWithScore) {
         ObjectNode node = new ObjectMapper().createObjectNode();
+        String username = securityService.findLoggedInUsername();
+        userRepository.findUserByUsername(username).setBestMatchJobName(jobWithScore.getName());
+        node.put("error", 0);
         node.put("errmsg", "nothing");
-        //Todo
         return node;
     }
 
     @GetMapping(path = "/user/job")
     public Map<String, Object> GetUserJobResult() {
-        Map<String, Object> map = new HashMap<String, Object>();
-        //Todo
+        Map<String, Object> map = new HashMap<>();
+        String username = securityService.findLoggedInUsername();
+        User user = userRepository.findUserByUsername(username);
+        String jobName = user.getBestMatchJobName();
+        JobWithScore jobWithScore = null;
+        for (UserJob userJob : user.getUserJobs()) {
+            if (userJob.getJob().getName().equals(jobName)) {
+                jobWithScore = new JobWithScore(userJob);
+            }
+        }
+        map.put("error", 0);
+        map.put("errmsg", "nothing");
+        map.put("data", jobWithScore);
         return null;
     }
 
@@ -140,26 +150,24 @@ public class UserController {
     }
 
     @PostMapping(path = "/user/tags")
-    public ObjectNode SaveUserSkills(@RequestBody SkillLevelList data) {
+    public ObjectNode SaveUserSkills(@RequestBody List<SkillLevel> data) {
         ObjectNode node = new ObjectMapper().createObjectNode();
         String username = securityService.findLoggedInUsername();
         User currentUser = userRepository.findUserByUsername(username);
-        for (SkillLevel skillLevel : data.getData()) {
+        userSkillService.DeleteUserSkill(currentUser);
+        for (SkillLevel skillLevel : data) {
             Skill skill = skillRepository.findSkillById(skillLevel.getId());
             if (skill == null) {
                 continue;
             }
             userSkillService.SaveUserSkill(currentUser, skill, skillLevel.getLevel());
         }
-        node.put("errmsg", 0);
+        node.put("error", 0);
+        node.put("errmsg", "ok");
         return node;
     }
 
 
-    @GetMapping(path = "/login")
-    public String getLoginForm() {
-        return "login";
-    }
 
     private User saveRegisterUser(UserDTO u) {
         try {

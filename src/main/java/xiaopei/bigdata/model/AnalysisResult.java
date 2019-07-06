@@ -29,16 +29,15 @@ public class AnalysisResult implements Serializable {
 
     private String job;
 
-    private Double score;
+    //private Double score;
 
     public AnalysisResult() {
     }
 
-    public AnalysisResult(User user, Skill skill, String job, Double score) {
+    public AnalysisResult(User user, Skill skill, String job) {
         this.user = user;
         this.skill = skill;
         this.job = job;
-        this.score = score;
         date = new Date();
     }
 

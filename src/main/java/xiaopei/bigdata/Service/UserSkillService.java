@@ -49,12 +49,21 @@ public class UserSkillService implements UserSkillServiceInterface {
         return false;
     }
 
+    @Override
+    public boolean DeleteUserSkill(User user) {
+        user.getUserSkills().clear();
+        if (user.getUserSkills().size() != 0)
+            return false;
+        userRepository.save(user);
+        return true;
+    }
+
     @Transactional(readOnly = true)
     @Override
     public List<SkillNameLevel> getUserSkillNameLevel(String username) {
         User user = userRepository.findUserByUsername(username);
         Set<UserSkill> userSkillList = user.getUserSkills();
-        List<SkillNameLevel> skills = new ArrayList<SkillNameLevel>();
+        List<SkillNameLevel> skills = new ArrayList<>();
         for (UserSkill userSkill : userSkillList) {
             skills.add(new SkillNameLevel(userSkill.getSkill(), userSkill.getLevel()));
         }

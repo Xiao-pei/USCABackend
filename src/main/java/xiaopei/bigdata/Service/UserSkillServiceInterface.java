@@ -11,5 +11,7 @@ public interface UserSkillServiceInterface {
 
     boolean DeleteUserSkill(User user, Skill skill);
 
+    boolean DeleteUserSkill(User user);
+
     List<SkillNameLevel> getUserSkillNameLevel(String username);
 }

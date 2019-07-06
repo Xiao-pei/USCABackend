@@ -32,9 +32,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .headers().contentTypeOptions().disable().and()
+                .headers().frameOptions().sameOrigin().and()
                 .authorizeRequests()
-                .antMatchers("/", "/register", "/search", "api/check").permitAll()
-                .anyRequest().permitAll()
+                .antMatchers("/", "/static/*", "/static/css/*", "/static/js/*", "/register", "/api/check").permitAll()
+                .anyRequest().authenticated()
                 .and()
                 .formLogin()
                 .loginPage("/login")
@@ -46,7 +48,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     ObjectMapper objectMapper = new ObjectMapper();
                     ObjectNode node = objectMapper.createObjectNode();
                     node.put("error", 0);
-                    node.put("message", "login success");
+                    node.put("errmsg", "login success");
                     node.put("username", user.getUsername());
                     out.write(objectMapper.writeValueAsString(node));
                     out.flush();
@@ -59,7 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     PrintWriter out = resp.getWriter();
                     ObjectNode node = objectMapper.createObjectNode();
                     node.put("error", 1);
-                    node.put("message", "login failed");
+                    node.put("errmsg", "login failed");
                     WriteString(resp.getWriter(), objectMapper.writeValueAsString(node));
                 })
                 .and()
@@ -69,7 +71,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     ObjectMapper objectMapper = new ObjectMapper();
                     ObjectNode node = objectMapper.createObjectNode();
                     node.put("error", 1);
-                    node.put("message", e.getMessage());
+                    node.put("errmsg", e.getMessage());
                     WriteString(resp.getWriter(), objectMapper.writeValueAsString(node));
                 })
                 /**Login required*/
@@ -80,7 +82,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     ObjectMapper objectMapper = new ObjectMapper();
                     ObjectNode node = objectMapper.createObjectNode();
                     node.put("error", 1);
-                    node.put("message", e.getMessage());
+                    node.put("errmsg", e.getMessage());
                     resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     WriteString(resp.getWriter(), objectMapper.writeValueAsString(node));
                 })
@@ -92,7 +94,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     ObjectMapper om = new ObjectMapper();
                     ObjectNode node = om.createObjectNode();
                     node.put("error", 0);
-                    node.put("message", "logout success");
+                    node.put("errmsg", "logout success");
                     WriteString(resp.getWriter(), om.writeValueAsString(node));
                 })
                 .permitAll()

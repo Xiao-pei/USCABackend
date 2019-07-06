@@ -25,6 +25,7 @@ public class User {
     @JsonIgnore
     private String securedPassword;
     private String telephone;
+    private String bestMatchJobName;
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserSkill> userSkills;
