@@ -14,7 +14,7 @@ public class UserSkillAnalysisService implements UserSkillAnalysisServiceInterfa
 
     @Override
     public void SaveUserSkillJobAnalysisResult(User user, Skill skill, String job, double score) {
-        AnalysisResult analysisResult = new AnalysisResult(user, skill, job, score);
+        AnalysisResult analysisResult = new AnalysisResult(user, skill, job);
         if (user.getAnalysisResults().contains(analysisResult))
             return;
         user.getAnalysisResults().add(analysisResult);
