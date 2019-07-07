@@ -60,8 +60,7 @@ public class UserSkillService implements UserSkillServiceInterface {
 
     @Transactional(readOnly = true)
     @Override
-    public List<SkillNameLevel> getUserSkillNameLevel(String username) {
-        User user = userRepository.findUserByUsername(username);
+    public List<SkillNameLevel> getUserSkillNameLevel(User user) {
         Set<UserSkill> userSkillList = user.getUserSkills();
         List<SkillNameLevel> skills = new ArrayList<>();
         for (UserSkill userSkill : userSkillList) {

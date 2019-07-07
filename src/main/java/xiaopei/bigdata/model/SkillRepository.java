@@ -10,4 +10,6 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
 
     Skill findSkillById(Long id);
 
+    Skill findSkillByName(String name);
+
 }

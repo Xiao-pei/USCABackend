@@ -35,8 +35,8 @@ public class DetailService implements UserDetailsService {
         if (user == null) throw new UsernameNotFoundException("user not found: " + s);
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
         if (user.getUserType() == 0)
-            grantedAuthorities.add(new SimpleGrantedAuthority("User"));
-        else grantedAuthorities.add(new SimpleGrantedAuthority("Admin"));
+            grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_User"));
+        else grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_Admin"));
 
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getSecuredPassword(), grantedAuthorities);
     }

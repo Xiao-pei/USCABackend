@@ -23,9 +23,6 @@ public class Skill {
     @JsonIgnore
     @OneToMany(mappedBy = "skill", fetch = FetchType.LAZY)
     private Set<UserSkill> userSkills;
-    @JsonIgnore
-    @OneToMany(mappedBy = "skill", fetch = FetchType.LAZY)
-    private Set<AnalysisResult> analysisResults;
 
     Skill() {
     }

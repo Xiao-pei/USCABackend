@@ -9,16 +9,16 @@ import org.springframework.web.bind.annotation.*;
 import xiaopei.bigdata.MyException;
 import xiaopei.bigdata.Service.SecurityServiceInterface;
 import xiaopei.bigdata.Service.UserDTORegisterServiceInterface;
-import xiaopei.bigdata.Service.UserSkillAnalysisServiceInterface;
 import xiaopei.bigdata.Service.UserSkillServiceInterface;
-import xiaopei.bigdata.model.DTO.*;
+import xiaopei.bigdata.model.DTO.JobWithScore;
+import xiaopei.bigdata.model.DTO.SkillLevel;
+import xiaopei.bigdata.model.DTO.SkillNameLevel;
+import xiaopei.bigdata.model.DTO.UserDTO;
 import xiaopei.bigdata.model.*;
 import xiaopei.bigdata.validator.UserValidator;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class UserController {
@@ -28,17 +28,15 @@ public class UserController {
     private final UserDTORegisterServiceInterface userDTORegisterService;
     private final SecurityServiceInterface securityService;
     private final UserSkillServiceInterface userSkillService;
-    private final UserSkillAnalysisServiceInterface userSkillAnalysisService;
 
 
-    public UserController(SecurityServiceInterface securityService, UserRepository userRepository, SkillRepository skillRepository, UserValidator userValidator, UserDTORegisterServiceInterface userDTORegisterService, UserSkillServiceInterface userSkillService, UserSkillAnalysisServiceInterface userSkillAnalysisService) {
+    public UserController(SecurityServiceInterface securityService, UserRepository userRepository, SkillRepository skillRepository, UserValidator userValidator, UserDTORegisterServiceInterface userDTORegisterService, UserSkillServiceInterface userSkillService) {
         this.securityService = securityService;
         this.userRepository = userRepository;
         this.skillRepository = skillRepository;
         this.userValidator = userValidator;
         this.userDTORegisterService = userDTORegisterService;
         this.userSkillService = userSkillService;
-        this.userSkillAnalysisService = userSkillAnalysisService;
     }
 
     @GetMapping(path = "/register")
@@ -55,7 +53,7 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             node.put("error", 1);
             node.put("field", bindingResult.getFieldError().getField());
-            node.put("code", bindingResult.getFieldError().getCode());
+            node.put("errmsg", bindingResult.getFieldError().getCode());
             return node;
         } else {
             registered = saveRegisterUser(user);
@@ -103,18 +101,20 @@ public class UserController {
         return node;
     }
 
-    @PostMapping(path = "/profile/update")
-    public ResponseEntity<Map<String, Object>> updateUserInfo(@ModelAttribute UserUpdateForm updateForm) {
-        Map<String, Object> map = new HashMap<>();
-        //Todo
-        return ResponseEntity.ok(map);
-    }
+//    @PostMapping(path = "/profile/update")
+//    public ResponseEntity<Map<String, Object>> updateUserInfo(@ModelAttribute UserUpdateForm updateForm) {
+//        Map<String, Object> map = new HashMap<>();
+//
+//        return ResponseEntity.ok(map);
+//    }
 
     @PostMapping(path = "/user/job")
-    public ObjectNode UserQingDingJob(@RequestParam JobWithScore jobWithScore) {
+    public ObjectNode UserQingDingJob(@RequestBody JobWithScore jobWithScore) {
         ObjectNode node = new ObjectMapper().createObjectNode();
         String username = securityService.findLoggedInUsername();
-        userRepository.findUserByUsername(username).setBestMatchJobName(jobWithScore.getName());
+        User user = userRepository.findUserByUsername(username);
+        user.setBestMatchJobName(jobWithScore.getName());
+        userRepository.save(user);
         node.put("error", 0);
         node.put("errmsg", "nothing");
         return node;
@@ -135,13 +135,29 @@ public class UserController {
         map.put("error", 0);
         map.put("errmsg", "nothing");
         map.put("data", jobWithScore);
-        return null;
+        return map;
+    }
+
+    @GetMapping(path = "/user/joblist")
+    public Map<String, Object> GetUserJobResults() {
+        Map<String, Object> map = new HashMap<>();
+        List<JobWithScore> jobWithScoreList = new ArrayList<>();
+        String username = securityService.findLoggedInUsername();
+        User user = userRepository.findUserByUsername(username);
+        for (UserJob userJob : user.getUserJobs()) {
+            jobWithScoreList.add(new JobWithScore(userJob));
+        }
+        Collections.sort(jobWithScoreList);
+        map.put("error", 0);
+        map.put("errmsg", "nothing");
+        map.put("data", jobWithScoreList);
+        return map;
     }
 
     @GetMapping(path = "/user/tags")
     public Map<String, Object> GetUserSkills() {
         String username = securityService.findLoggedInUsername();
-        List<SkillNameLevel> skills = userSkillService.getUserSkillNameLevel(username);
+        List<SkillNameLevel> skills = userSkillService.getUserSkillNameLevel(userRepository.findUserByUsername(username));
         Map<String, Object> map = new HashMap<>();
         map.put("error", 0);
         map.put("errmsg", "nothing");
