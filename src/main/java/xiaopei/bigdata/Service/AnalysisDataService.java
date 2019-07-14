@@ -50,9 +50,11 @@ public class AnalysisDataService implements AnalysisDataServiceInterface {
         Set<String> keyset = hashMap.keySet();
         for (String job : keyset) {
             Job tmp = jobRepository.findJobByName(job);
+            if (tmp == null)
+                continue;
             double score = hashMap.get(job);
             result.add(new JobWithScore(tmp.getId(), job, score));
-        }//Todo
+        }
         Collections.sort(result);
         List<JobWithScore> sortedResult = new ArrayList<>();
         for (int i = 0; i < 5; ++i) {
